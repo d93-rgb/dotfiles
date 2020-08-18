@@ -74,7 +74,7 @@ set mouse=r         " Enable the use of the mouse.
 
 
 " Highlight the line with a cursor
-set cursorline
+" set cursorline
 
 " Disable cursor line highlighting in Insert mode
 augroup aug_cursor_line
@@ -922,24 +922,24 @@ call airline#parts#define_accent('_obsession', 'bold')
 " Extension: gutentags
 " function! GetGutentagStatusText(mods) abort
 "     let l:msg = ''
-" 
+"
 "     " Show indicator when tags are enabled
 "     if g:gutentags_enabled
 "         let l:msg .= 'ⓣ' . s:spc
 "     endif
-" 
+"
 "     " Show indicator when tag generation is in progress
 "     if index(a:mods, 'ctags') >= 0
 "         let l:msg = '~' . l:msg
 "     endif
-" 
+"
 "     return l:msg
 " endfunction
 
 " function! AirlineGutentagsPart()
 "     return gutentags#statusline_cb(function('GetGutentagStatusText'), 1)
 " endfunction
-" 
+"
 " call airline#parts#define_function('_gutentags', 'AirlineGutentagsPart')
 " call airline#parts#define_accent('_gutentags', 'bold')
 
@@ -1082,7 +1082,6 @@ let g:airline#extensions#tabline#right_alt_sep = ''
 let g:airline#extensions#tabline#show_buffers = 0
 
 " }}}
-
 
 " PLUGIN: NERDTree {{{
 

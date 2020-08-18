@@ -123,5 +123,5 @@ stty -ixon
 
 # dotfiles git repo 
 alias dotgit="/usr/bin/git --git-dir=$HOME/Documents/dotfiles/.git --work-tree=$HOME"
-alias dotgits="/usr/bin/git --git-dir=$HOME/Documents/dotfiles/.git --work-tree=$HOME status"
+alias dotgits="/usr/bin/git --git-dir=$HOME/Documents/dotfiles/.git --work-tree=$HOME status -uno"
 
