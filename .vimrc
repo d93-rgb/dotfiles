@@ -100,7 +100,6 @@ set scrolloff=2
 " Allow Backspace to work over indent, line endings, and start of insert. By default Backspace works only against inserted text
 set backspace=indent,eol,start
 
-
 " Do not warn abount unsaved changes when navigating to another buffer
 set hidden
 

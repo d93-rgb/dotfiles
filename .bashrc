@@ -36,41 +36,41 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
-esac
-
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-#force_color_prompt=yes
-
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# we have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
-    else
-	color_prompt=
-    fi
-fi
-
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-unset color_prompt force_color_prompt
+# case "$TERM" in
+#     xterm-color|*-256color) color_prompt=yes;;
+# esac
+# 
+# # uncomment for a colored prompt, if the terminal has the capability; turned
+# # off by default to not distract the user: the focus in a terminal window
+# # should be on the output of commands, not on the prompt
+# #force_color_prompt=yes
+# 
+# if [ -n "$force_color_prompt" ]; then
+#     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+# 	# we have color support; assume it's compliant with Ecma-48
+# 	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+# 	# a case would tend to support setf rather than setaf.)
+# 	color_prompt=yes
+#     else
+# 	color_prompt=
+#     fi
+# fi
+# 
+# if [ "$color_prompt" = yes ]; then
+#     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+# else
+#     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+# fi
+# unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+# case "$TERM" in
+# xterm*|rxvt*)
+#     PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+#     ;;
+# *)
+#     ;;
+# esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -120,6 +120,99 @@ fi
 
 stty -ixon
 
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+export JAVA_HOME=/opt/jdk-14
+
+man() {
+    env LESS_TERMCAP_mb=$'\E[01;31m' \
+        LESS_TERMCAP_md=$'\E[01;38;5;74m' \
+        LESS_TERMCAP_me=$'\E[0m' \
+        LESS_TERMCAP_se=$'\E[0m' \
+        LESS_TERMCAP_so=$'\E[38;5;246m' \
+        LESS_TERMCAP_ue=$'\E[0m' \
+        LESS_TERMCAP_us=$'\E[04;38;5;146m' \
+        man "$@"
+}
+
+###### CUSTOMIZE PROMPT HERE ######
+INITIALIZED=${INITIALIZED:-0}
+
+if [[ $INITIALIZED == 0 ]]
+then
+    INITIALIZED=1
+
+    BOLD=$(tput bold)
+    WHITE=$(tput setaf 15)
+    BLUE=$(tput setaf 4)
+    WHITE_BLUE=$(tput setaf 189)
+    TEAL=$(tput setaf 80)
+    YELLOW=$(tput setaf 11)
+    GREEN=$(tput setaf 10)
+    GREEN_2=$(tput setaf 2)
+    RED=$(tput setaf 9)
+    ORANGE=$(tput setaf 208)
+    PURPLE=$(tput setaf 140)
+    RESET=$(tput sgr0)
+
+    # ignore unicodes for now, they are buggy and cause a crash (bad alloc)
+    function print_symbol()
+    {
+        if [[ $? == 0 ]]
+        then
+            #echo -e "\001\e[01;32m\002\xe2\x9c\x93"
+            echo -e "\001\e[07;32m\002  \001$RESET\002"
+        else
+            echo -e "\001\e[07;31m\002  \001$RESET\002"
+            #echo -e "\001\e[01;31m\002\xe2\x9c\x97"
+        fi
+    }
+
+    function print_uid()
+    {
+        if [[ ${EUID} == 0 ]]
+        then
+            echo -e "\001\e[01;31m\002\h"
+        else
+            echo -e "\001\e[01;33m\002\u@\h"
+        fi
+    }
+
+    function set_prompt()
+    {
+        PS1=" \[$BOLD\]\$? $(print_symbol)\[$RED\]\[$BOLD\] \[$PURPLE\]\u\[$WHITE_BLUE\]@\[$TEAL\]\h\[$WHITE_BLUE\]:\[$BLUE\]\w\[$WHITE\]>\[$RESET\] "
+        #with UID
+        #PS1=" \[$BOLD\]\$? $(print_symbol) $(print_uid)\[$WHITE\] \w \[$GREEN\]\\$\[$RESET\] "
+    }
+
+    PROMPT_COMMAND="set_prompt ${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+fi
+###### END OF PROMPT CUSTOMIZATION ######
+
+# set ls colors !!USE .bash_profile instead so it will be only set once
+#LS_COLORS=$LS_COLORS:'ln=1;95:'
+#export LS_COLORS
+
+MAN_POSIXLY_CORRECT=1
+export MAN_POSIXLY_CORRECT
+
+#show line info and read percentage of man pages
+export MANPAGER='less -s -M +Gg'
+
+# dont add commands with leading space to bash history
+export HISTCONTROL=ignorespace
+
+# disable terminal scroll lock when typing C-s
+stty -ixon
+
+shopt -s checkwinsize
+# enable vi mode and show mode indicator
+set -o vi
+bind 'set show-mode-in-prompt on'
+
+# grep custom colors for files
+# 30;96 equals to bright cyan in ansi color escape format
+export GREP_COLORS='fn=30;96'
 
 # dotfiles git repo 
 alias dotgit="/usr/bin/git --git-dir=$HOME/Documents/dotfiles/.git --work-tree=$HOME"
