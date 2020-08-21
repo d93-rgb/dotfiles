@@ -118,6 +118,9 @@ set conceallevel=2
 set textwidth=0
 set wrapmargin=0
 
+set timeoutlen=500
+set ttimeoutlen=50
+
 " Additional <ESC> mappings:
 " <C-c>, I'm so used to it after shell environment
 noremap <C-C> <ESC>
