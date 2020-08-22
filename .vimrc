@@ -310,7 +310,6 @@ set smartcase
 " Do not highlight search results by default
 " Enable incremental searching
 " Stop when reaching last match, don't start over
-set nohlsearch
 set incsearch
 set wrapscan
 
