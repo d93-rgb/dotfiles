@@ -1,3 +1,4 @@
+" Settings {{{
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
@@ -76,13 +77,6 @@ set mouse=r         " Enable the use of the mouse.
 " Highlight the line with a cursor
 " set cursorline
 
-" Disable cursor line highlighting in Insert mode
-augroup aug_cursor_line
-  au!
-  au InsertEnter * setlocal nocursorline
-  au InsertLeave * setlocal cursorline
-augroup END
-
 " always show status line
 set laststatus=2
 
@@ -126,16 +120,19 @@ set ttimeoutlen=50
 noremap <C-C> <ESC>
 xnoremap <C-C> <ESC>
 
+" }}}
+
 " Plugins{{{
 " Minimalist Vim Plugin Manager - https://github.com/junegunn/vim-plug
 call plug#begin('~/.vim/plugged')
+  Plug 'owickstrom/vim-colors-paramount'
+  Plug 'mhinz/vim-startify'
   Plug 'scrooloose/nerdtree'
   Plug '907th/vim-auto-save'
   Plug 'dracula/vim', { 'as': 'dracula' }
   Plug 'sstallion/vim-wtf'
   Plug 'arcticicestudio/nord-vim'
   Plug 'huyvohcmc/atlas.vim'
-  Plug 'tpope/vim-obsession'
   Plug 'vim-airline/vim-airline'
   Plug 'vim-airline/vim-airline-themes'
   Plug 'junegunn/fzf', { 'do': './install --bin' }
@@ -226,54 +223,12 @@ let g:colors = {
       \ 'white': ["#FFFFFF", 231],
       \}
 
-fun s:PatchDraculaScheme()
-  hi! ColorColumn ctermfg=255 ctermbg=203 guifg=#F8F8F2 guibg=#FF5555
-
-  " Show NERDTree directory nodes in yellow
-  hi! __DirectoryNode cterm=bold ctermfg=214 gui=bold guifg=#E7A427
-  hi! link NerdTreeDir __DirectoryNode
-  hi! link NERDTreeFlags __DirectoryNode
-
-  " Show NERDTree toggle icons as white
-  hi! link NERDTreeOpenable Normal
-  hi! link NERDTreeClosable Normal
-
-  " Do not highlight changed line, highlight only changed text within a line
-  hi! DiffText term=NONE ctermfg=215 ctermbg=233 cterm=NONE guifg=#FFB86C guibg=#14141a gui=NONE
-  hi! link DiffChange NONE
-  hi! clear DiffChange
-
-  " dyng/ctrlsf.vim
-  hi! link ctrlsfMatch DraculaOrange
-  hi! link ctrlsfCuttingLine Title
-
-  " Use a bit deeper yellow/orange color
-  hi! DraculaOrange guifg=#F09F17 ctermfg=214
-  hi! DraculaOrangeBold cterm=bold ctermfg=214 gui=bold guifg=#F09F17
-  hi! DraculaOrangeBoldItalic cterm=bold,italic ctermfg=214 gui=bold,italic guifg=#F09F17
-  hi! DraculaOrangeInverse ctermfg=236 ctermbg=214 guifg=#282A36 guibg=#F09F17
-  hi! DraculaOrangeItalic cterm=italic ctermfg=214 gui=italic guifg=#F09F17
-
-  " In Dracula theme, ALEError->DraculaErrorLine, ALEWarning->DraculaWarnLine
-  " No need to set ALEStyleError and ALEStyleWarning, as they are linked to ALEError/ALEWarning
-  hi! DraculaWarnLine cterm=undercurl ctermfg=214 gui=undercurl guifg=#F09F17 guisp=#F09F17
-endf
-
-
 " Shortcut command to 'vim-scripts/SyntaxAttr.vim'
 command ViewSyntaxAttr call SyntaxAttr()
-
-" Customime color scheme after it was loaded
-augroup aug_color_scheme
-  au!
-
-  autocmd ColorScheme dracula call s:PatchDraculaScheme()
-augroup END
 
 " Apply a particular color scheme
 " NOTE: Should go after 'autocmd ColorScheme' customization
 set background=dark
-" colorscheme dracula
 
 augroup nord-overrides
   autocmd!
@@ -282,7 +237,7 @@ augroup nord-overrides
   autocmd ColorScheme nord highlight FoldColumn guifg=#7b88a1
 augroup END
 
-colorscheme sorcerer
+colorscheme paramount
 
 " colorscheme wtf
 hi Constant ctermfg=226 cterm=bold
@@ -297,6 +252,15 @@ hi MatchParen ctermbg=20
 
 hi Pmenu ctermbg=56 ctermfg=7
 hi PmenuSel ctermbg=7 ctermfg=0
+
+hi Statement cterm=bold ctermfg=50 guifg=#ef0ec0
+
+function! SynStack()
+  if !exists("*synstack")
+    return
+  endif
+  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunc
 
 
 " }}}
@@ -330,99 +294,6 @@ nnoremap <silent> g/ :call <SID>PrintSearchTotalCount()<CR>
 " Don't use :nohl, because by default searches are not highlighted
 nnoremap <silent> <leader>n :set hlsearch!<cr>
 
-" Detect when search command line is entered and left
-" Detect when search is triggered by hooking into <CR>
-" Inspired by https://github.com/google/vim-searchindex
-augroup aug_search
-  autocmd!
-
-  " Pitfall: Works only in vim8. CmdlineEnter and CmdlineLeave appeared in vim8
-  autocmd CmdlineEnter /,\? call <SID>on_search_cmdline_focus(1)
-  autocmd CmdlineLeave /,\? call <SID>on_search_cmdline_focus(0)
-
-  " Detect when search command window is entered
-  autocmd CmdwinEnter *
-        \ if getcmdwintype() =~ '[/?]' |
-        \   silent! nmap <buffer> <CR> <CR><Plug>OnSearchCompleted|
-        \ endif
-augroup END
-
-function! s:on_search_cmdline_focus(enter)
-  if a:enter
-    " Turn on hlsearch to highlight all matches during incremental search
-    set hlsearch
-
-    " Use <C-j> and <C-k> to navigate through matches during incremental search instead of <C-d>,<C-t>
-    cmap <C-j> <C-g>
-    cmap <C-k> <C-t>
-
-    " Detect when search is triggered by hooking into <CR>
-    cmap <expr> <CR> "\<CR>" . (getcmdtype() =~ '[/?]' ? "<Plug>OnSearchCompleted" : "")
-  else
-    " On cmdline leave, rollback all changes and mappings
-    set nohlsearch
-
-    cunmap <C-j>
-    cunmap <C-k>
-    cunmap <CR>
-  endif
-endfunction
-
-" Define OnSearchCompleted hook
-noremap  <Plug>OnSearchCompleted <Nop>
-nnoremap <silent> <Plug>OnSearchCompleted :call <SID>OnSearchCompleted()<CR>
-
-function s:OnSearchCompleted()
-  " Print total search matches count
-  call s:PrintSearchTotalCount()
-
-  " Open folds in the matches lines
-  " foldopen+=search causes search commands to open folds in the matched line
-  " - but it doesn't work in mappings. Hence, we just open the folds here.
-  if &foldopen =~# "search"
-    normal! zv
-  endif
-
-  " Recenter screen for any kind of search (same as we do for n/N shortcuts)
-  normal! zz
-endfunction
-
-function s:PrintSearchTotalCount()
-  " Detect search direction
-  let search_dir = v:searchforward ? '/' : '?'
-
-  " Remember cursor position
-  let pos=getpos('.')
-
-  " Remember start and end marks of last change/yank
-  let saved_marks = [ getpos("'["), getpos("']") ]
-
-  try
-    " Execute "%s///gn" command to capture match count for the last search pattern
-    let output = ''
-    redir => output
-      silent! keepjumps %s///gne
-    redir END
-
-    " Extract only match count from string like "X matches on Y lines"
-    let match_count = str2nr(matchstr(output, '\d\+'))
-
-    " Compose message like "X matches for /pattern"
-    let msg = l:match_count . " matches for " . l:search_dir . @/
-
-    " Flush any delayed screen updates before printing "l:msg".
-    " See ":h :echo-redraw".
-    redraw | echo l:msg
-  finally
-
-    " Restore [ and ] marks
-    call setpos("'[", saved_marks[0])
-    call setpos("']", saved_marks[1])
-
-    " Restore cursor position
-    call setpos('.', pos)
-  endtry
-endfunction
 
 " Make '*' and '#' search for a selection in visual mode
 " Inspired by https://github.com/nelstrom/vim-visual-star-search
@@ -454,6 +325,8 @@ set clipboard=unnamed,unnamedplus
 nnoremap Y y$
 
 "}}}
+
+" vim-yoink {{{
 
 " ------------------------------
 " https://github.com/svermeulen/vim-yoink
@@ -488,6 +361,7 @@ nmap P <plug>(YoinkPaste_P)
 nmap y <plug>(YoinkYankPreserveCursorPosition)
 xmap y <plug>(YoinkYankPreserveCursorPosition)
 
+" }}}
 
 " Folding ---------------------------------------------------------{{{
 
@@ -908,41 +782,8 @@ let s:spc = g:airline_symbols.space
 " - obsession (btw, it does not work for some reason)
 " - gutentags
 " - tagbar
-let g:airline#extensions#obsession#enabled=0
 " let g:airline#extensions#gutentags#enabled = 0
 let g:airline#extensions#tagbar#enabled = 0
-
-" Extension: obsession
-function! GetObsessionStatus()
-    return ObsessionStatus('ⓢ' . s:spc, '')
-endfunction
-
-call airline#parts#define_function('_obsession', 'GetObsessionStatus')
-call airline#parts#define_accent('_obsession', 'bold')
-
-" Extension: gutentags
-" function! GetGutentagStatusText(mods) abort
-"     let l:msg = ''
-"
-"     " Show indicator when tags are enabled
-"     if g:gutentags_enabled
-"         let l:msg .= 'ⓣ' . s:spc
-"     endif
-"
-"     " Show indicator when tag generation is in progress
-"     if index(a:mods, 'ctags') >= 0
-"         let l:msg = '~' . l:msg
-"     endif
-"
-"     return l:msg
-" endfunction
-
-" function! AirlineGutentagsPart()
-"     return gutentags#statusline_cb(function('GetGutentagStatusText'), 1)
-" endfunction
-"
-" call airline#parts#define_function('_gutentags', 'AirlineGutentagsPart')
-" call airline#parts#define_accent('_gutentags', 'bold')
 
 " Extension: Diff or merge indicator
 function! AirlineDiffmergePart()
