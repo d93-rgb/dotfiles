@@ -71,7 +71,7 @@ set background=dark " When set to "dark", Vim will try to use colors that look
                     " try to use colors that look good on a light background.
                     " Any other value is illegal.
 
-set mouse=r         " Enable the use of the mouse.
+set mouse=a         " Enable the use of the mouse.
 
 
 " Highlight the line with a cursor
@@ -230,19 +230,19 @@ command ViewSyntaxAttr call SyntaxAttr()
 " NOTE: Should go after 'autocmd ColorScheme' customization
 set background=dark
 
-augroup nord-overrides
-  autocmd!
-  autocmd ColorScheme nord highlight Comment guifg=#7b88a1 gui=bold
-  autocmd ColorScheme nord highlight Folded guifg=#7b88a1
-  autocmd ColorScheme nord highlight FoldColumn guifg=#7b88a1
-augroup END
+"augroup nord-overrides
+"  autocmd!
+"  autocmd ColorScheme nord highlight Comment guifg=#7b88a1 gui=bold
+"  autocmd ColorScheme nord highlight Folded guifg=#7b88a1
+"  autocmd ColorScheme nord highlight FoldColumn guifg=#7b88a1
+"augroup END
 
 colorscheme paramount
 
 " colorscheme wtf
 hi Constant ctermfg=226 cterm=bold
 
-hi Comment ctermfg=244
+hi Comment ctermfg=246  guifg=#949494
 
 hi Visual ctermbg=15
 
@@ -253,7 +253,7 @@ hi MatchParen ctermbg=20
 hi Pmenu ctermbg=56 ctermfg=7
 hi PmenuSel ctermbg=7 ctermfg=0
 
-hi Statement cterm=bold ctermfg=50 guifg=#ef0ec0
+hi Statement cterm=bold ctermfg=50 guifg=#F16529
 
 function! SynStack()
   if !exists("*synstack")
@@ -855,7 +855,7 @@ let g:airline#extensions#whitespace#mixed_indent_file_format = 'i[%s]'
 
 " Airline sections customization
 let g:airline_section_a = airline#section#create_left(['mode', 'scratch', 'crypt', 'paste', 'keymap', 'spell', 'capslock', 'xkblayout', 'iminsert'])
-let g:airline_section_z = airline#section#create(['_autosave', '_diffmerge', '_obsession', '%3p%% ', 'linenr', ':%3v'])
+let g:airline_section_z = airline#section#create(['_autosave', '_diffmerge', '%3p%% ', 'linenr', ':%3v'])
 let g:airline_section_c = airline#section#create(['bufnr', '%<', '%f', 'modified', ' ', 'readonly'])
 
 " Tell at which window width sections are shrinked

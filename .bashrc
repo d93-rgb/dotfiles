@@ -96,6 +96,8 @@ alias l='ls -la'
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
+alias xgraph=/home/damian/opt/XGraph4.38_linux64/bin/xgraph
+
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
@@ -122,7 +124,7 @@ stty -ixon
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-export JAVA_HOME=/opt/jdk-14
+#export JAVA_HOME=/opt/jdk-14
 
 man() {
     env LESS_TERMCAP_mb=$'\E[01;31m' \
@@ -189,9 +191,9 @@ then
 fi
 ###### END OF PROMPT CUSTOMIZATION ######
 
-# set ls colors !!USE .bash_profile instead so it will be only set once
-#LS_COLORS=$LS_COLORS:'ln=1;95:'
-#export LS_COLORS
+# set ls colors 
+LS_COLORS=$LS_COLORS:'di=1;94:'
+export LS_COLORS
 
 MAN_POSIXLY_CORRECT=1
 export MAN_POSIXLY_CORRECT
